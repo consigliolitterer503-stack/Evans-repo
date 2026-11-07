@@ -1,0 +1,77 @@
+name: windows-smoke
+
+# 目的：在没有 Windows 机器的情况下，验证插件能在真正的 Windows 上
+#   1) 装进 profile    2) 被 dsh 加载（dump-config 条目数=1）  3) 版本号正确
+# 不验证：浏览器界面、模型对话（那需要真机或虚拟机）。
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "package.json"
+      - "lib/**"
+      - "cordis.patch.yml"
+      - "scripts/**"
+      - ".github/workflows/windows-smoke.yml"
+  workflow_dispatch:
+
+jobs:
+  install:
+    runs-on: windows-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 安装宿主 DSH 0.2.1-rc.2
+        run: npm i -g @deepseek-ai/dsh@0.2.1-rc.2
+
+      - name: 宿主版本
+        run: dsh --version
+
+      - name: 打包插件
+        run: npm pack
+
+      - name: 生成空 profile
+        run: dsh --profile web --dump-config | Out-Null
+
+      - name: 安装插件
+        shell: pwsh
+        run: |
+          $tgz = Get-ChildItem -Filter "dsh-purge-*.tgz" | Select-Object -First 1
+          Write-Host "installing $($tgz.Name)"
+          dsh plugin --profile web add --ignore-scripts $tgz.FullName
+
+      - name: 登记到 profile
+        shell: pwsh
+        run: |
+          Set-Location "$env:USERPROFILE\.dsh\profiles\web"
+          node node_modules/dsh-purge/scripts/ensure-profile-bundle.mjs
+
+      - name: 断言版本号
+        shell: pwsh
+        run: |
+          Set-Location "$env:USERPROFILE\.dsh\profiles\web"
+          $v = node -p "require('./node_modules/dsh-purge/package.json').version"
+          Write-Host "installed version: $v"
+          if ($v -ne "1.1.71-rc2.1") { throw "版本不符：$v" }
+
+      - name: 断言挂载条目数
+        shell: pwsh
+        run: |
+          $n = (dsh --profile web --dump-config | Select-String -Pattern '^- id: dsh-purge$').Count
+          Write-Host "dsh-purge entries: $n"
+          if ($n -ne 1) { throw "预期 1 条，实际 $n 条" }
+
+      - name: 关键文件存在性
+        shell: pwsh
+        run: |
+          $base = "$env:USERPROFILE\.dsh\profiles\web\node_modules\dsh-purge"
+          foreach ($f in @("lib\identity.js", "lib\core.js", "cordis.patch.yml", "client.js", "bin\dsh-purge.js")) {
+            if (-not (Test-Path (Join-Path $base $f))) { throw "缺少 $f" }
+          }
+          Write-Host "关键文件齐全"
