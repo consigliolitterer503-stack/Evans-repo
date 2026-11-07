@@ -39,6 +39,18 @@ jobs:
       - name: 生成空 profile
         run: dsh --profile web --dump-config | Out-Null
 
+      - name: 诊断路径
+        shell: pwsh
+        run: |
+          Write-Host "USERPROFILE = $env:USERPROFILE"
+          Write-Host "dsh 位置   = $((Get-Command dsh).Source)"
+          Write-Host "--- $env:USERPROFILE 下的隐藏目录 ---"
+          Get-ChildItem $env:USERPROFILE -Force -Directory | Select-Object -ExpandProperty Name
+          Write-Host "--- .dsh 树 ---"
+          if (Test-Path "$env:USERPROFILE\.dsh") {
+            Get-ChildItem "$env:USERPROFILE\.dsh" -Recurse -Depth 2 -Force | Select-Object -First 40 -ExpandProperty FullName
+          } else { Write-Host "没有 .dsh 目录" }
+
       - name: 安装插件
         shell: pwsh
         run: |
@@ -49,7 +61,9 @@ jobs:
       - name: 登记到 profile
         shell: pwsh
         run: |
-          Set-Location "$env:USERPROFILE\.dsh\profiles\web"
+          $profileDir = Join-Path $env:USERPROFILE ".dsh\profiles\web"
+          if (-not (Test-Path $profileDir)) { throw "profile 不存在：$profileDir" }
+          Set-Location $profileDir
           node node_modules/dsh-purge/scripts/ensure-profile-bundle.mjs
 
       - name: 断言版本号
