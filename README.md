@@ -1,5 +1,5 @@
 > **Fork notice.** Based on [dsh-purge 1.1.71](https://github.com/HunYiSage/dsh-purge)
-> by 小杨, MIT licensed. This fork: https://github.com/evan54529555-hash/Evans-repo
+> by 小杨, MIT licensed. This fork: https://github.com/evan545295555-hash/Evans-repo
 > Maintainer: 巴里啊啊.
 >
 > Changes: adapted for DSH 0.2.1-rc.2 — removed the `{{cwd}}` prompt-variable

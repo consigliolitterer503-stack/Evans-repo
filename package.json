@@ -56,11 +56,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/evan54529555-hash/Evans-repo.git"
+    "url": "git+https://github.com/evan545295555-hash/Evans-repo.git"
   },
-  "homepage": "https://github.com/evan54529555-hash/Evans-repo#readme",
+  "homepage": "https://github.com/evan545295555-hash/Evans-repo#readme",
   "bugs": {
-    "url": "https://github.com/evan54529555-hash/Evans-repo/issues"
+    "url": "https://github.com/evan545295555-hash/Evans-repo/issues"
   },
   "dsh": {
     "bundle": {
@@ -78,9 +78,9 @@
     },
     "install": {
       "preferred": "tarball",
-      "tarball": "https://github.com/evan54529555-hash/Evans-repo/releases/download/v1.1.71-rc2.1/dsh-purge-1.1.71-rc2.1.tgz",
-      "zip": "https://github.com/evan54529555-hash/Evans-repo/archive/refs/tags/v1.1.71-rc2.1.zip",
-      "git": "git+https://github.com/evan54529555-hash/Evans-repo.git"
+      "tarball": "https://github.com/evan545295555-hash/Evans-repo/releases/download/v1.1.71-rc2.1/dsh-purge-1.1.71-rc2.1.tgz",
+      "zip": "https://github.com/evan545295555-hash/Evans-repo/archive/refs/tags/v1.1.71-rc2.1.zip",
+      "git": "git+https://github.com/evan545295555-hash/Evans-repo.git"
     }
   },
   "publishConfig": {
